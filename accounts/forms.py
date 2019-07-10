@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
+from .models import GuestEmail
+
 User = get_user_model()
 
 class ContactForm(forms.Form):
@@ -70,3 +72,25 @@ class RegisterForm(forms.Form):
         if password2 != password:
             raise forms.ValidationError("Passwords must match.")
         return data
+
+
+class GuestForm(forms.ModelForm):
+    #email    = forms.EmailField()
+    class Meta:
+        model = GuestEmail
+        fields = [
+            'email'
+        ]
+
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
+        super(GuestForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        obj = super(GuestForm, self).save(commit=False)
+        if commit:
+            obj.save()
+            request = self.request
+            request.session['guest_email_id'] = obj.id
+        return obj

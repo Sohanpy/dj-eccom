@@ -1,14 +1,19 @@
 from django.shortcuts import render , redirect
 from products.models import Products
+from orders.models import Oder
+from accounts.forms import GuestForm
 from .models import Cart
+
+
 
 def carthome(request):
     cart_obj, new_obj = Cart.objects.new_or_get(request)
     products = Cart.objects.all()
+    order = Oder.objects.all()
 
     context = {
         'cart' : cart_obj,
-        'products':products
+        'products':products,
     }
     return render(request , 'cart.html' , context)
 
@@ -28,3 +33,16 @@ def cart_update(request):
             cart_obj.products.add(product_obj)
         request.session['total_item'] = cart_obj.products.count()
     return redirect('cart:details')
+
+def checkout_home(request):
+    cart_obj, new_obj = Cart.objects.new_or_get(request)
+    order_obj = None
+    if new_obj:
+        return redirect('cart:details')
+    else:
+        order_obj , new_order_obj = Oder.objects.get_or_create(cart = cart_obj)
+
+    context = {
+        'object':order_obj
+    }
+    return render(request , 'checkout.html')

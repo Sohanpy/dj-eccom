@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import pre_save,post_save , m2m_changed
@@ -41,3 +42,25 @@ class Cart(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+def cart_total(sender , action , instance , *args , **kwargs):
+    if action == 'post_add' or action == 'post_remove' or action == 'post_clear':
+        products = instance.products.all()
+        total = 0
+        for x in products:
+            total += x.price
+        
+        if instance.subtotal != total:
+            instance.subtotal = total
+            instance.save()
+
+m2m_changed.connect(cart_total , sender=Cart.products.through)
+
+def pre_save_cart_reciever(sender , instance , *args , **kwargs):
+    if instance.subtotal > 0:
+        instance.total = Decimal(instance.subtotal) * Decimal(1.08) #tax
+
+    else:
+        instance.total = 0.00
+pre_save.connect(pre_save_cart_reciever , sender=Cart)

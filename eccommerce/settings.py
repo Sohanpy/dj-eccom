@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'cart',
     'products',
 
-    'imagekit'
+    'imagekit',
+    'addresses',
+    'billing',
+    'orders'
 ]
 
 MIDDLEWARE = [
