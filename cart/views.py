@@ -37,7 +37,7 @@ def cart_update(request):
 def checkout_home(request):
     cart_obj, new_obj = Cart.objects.new_or_get(request)
     order_obj = None
-    if new_obj:
+    if new_obj or cart_obj.products.count() ==0:
         return redirect('cart:details')
     else:
         order_obj , new_order_obj = Oder.objects.get_or_create(cart = cart_obj)
@@ -45,4 +45,4 @@ def checkout_home(request):
     context = {
         'object':order_obj
     }
-    return render(request , 'checkout.html')
+    return render(request , 'checkout.html' , context)
