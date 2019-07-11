@@ -1,7 +1,9 @@
 from django.shortcuts import render , redirect
+from accounts.models import GuestEmail
 from products.models import Products
+from billing.models import BillingProfile
 from orders.models import Oder
-from accounts.forms import GuestForm
+from accounts.forms import GuestForm , LoginForm
 from .models import Cart
 
 
@@ -41,8 +43,20 @@ def checkout_home(request):
         return redirect('cart:details')
     else:
         order_obj , new_order_obj = Oder.objects.get_or_create(cart = cart_obj)
+    login_form = LoginForm()
+    guest_form = GuestForm()
+    guest_email_id = request.session.get('guest_email_id')
+    if request.user.is_authenticated:
+        billing_profile , billing_profile_created = BillingProfile.objects.get_or_create(user = request.user , email = request.user.email)
+    elif guest_email_id is not None:
+        guest_email_obj = GuestEmail.objects.get(id = guest_email_id)
+        guest_billing_profile , guest_billing_profile_created = BillingProfile.objects.get_or_create(email = guest_email_obj.email)
+    else:
+        pass
 
     context = {
-        'object':order_obj
+        'object':order_obj,
+        'login_form':LoginForm,
+        'guest_form':GuestForm
     }
     return render(request , 'checkout.html' , context)

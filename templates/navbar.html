@@ -18,9 +18,18 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">Services</a>
               </li>
+              {% if request.user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="#">Contact</a>
+                <a class="nav-link" href="http://127.0.0.1:8000/admin/logout/">logout</a>
               </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/accounts/login">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="http://127.0.0.1:8000/accounts/logout">Register</a>
+              </li>
+              {% endif %}
             </ul>
           </div>
         </div>
